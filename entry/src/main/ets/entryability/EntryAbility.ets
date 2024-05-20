@@ -14,23 +14,25 @@ export default class EntryAbility extends UIAbility {
 
   async  onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
-    // 检查是否有广告
-    const setting=new UserSettingClass(this.context)//getcontext拿到的是undefined
-    //
-    const ad= await new Promise<AdvertClass>((resolve,reject)=>{
+    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    // 这里要尝试去读一下运营的配置-我们现在还没有实现接口，直接模拟一下
+    const userSetting=new UserSettingClass(this.context)
+    const result=await new Promise<AdvertClass>((resolve,reject)=>{
       setTimeout(()=>{
-        resolve(defaultAd)
+        resolve({
+          showAd:true,
+          adTime:5,
+          adImg:$r('app.media.start')
+        }as AdvertClass)
       },500)
     })
-    // 通过模拟请求拿到广告信息
-    await setting.setUserAd(ad) // 写入首选项
-    if(ad.showAd) {
-      // 展示广告的情况 展示广告页 有时限
-      // 创建一个子窗口 子窗口加载广告 广告播完 窗口销毁
+    await userSetting.setUserAd(result)//写入首选项
+    if (result.showAd){
+      const win =await windowStage.createSubWindow("ad_window")
+      await win.showWindow()
+      win.setUIContent("/pages/Start/Start".slice(1))
     }
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-
-    windowStage.loadContent('pages/Index', (err) => {
+    windowStage.loadContent('/pages/Index'.slice(1), (err) => {
       if (err.code) {
         hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
