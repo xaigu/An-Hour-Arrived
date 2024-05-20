@@ -2,6 +2,7 @@ import { AdvertClass } from '../models'
 import { Context } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { USER_SETTING, USER_SETTING_AD } from '../constants/setting'
+import { TOKEN_KEY } from '../constants'
 
 // 默认广告选项
 export  const defaultAd:AdvertClass={
@@ -30,5 +31,15 @@ export class  UserSettingClass{
   async  getUserAd(): Promise<AdvertClass>{
     const adStore=await this.getstore()
     return  JSON.parse(await adStore.get(USER_SETTING_AD, JSON.stringify(defaultAd)) as string) as AdvertClass
+  }
+  async setUserToken (token: string) {
+    const adStore = await this.getstore()
+    await adStore.put(TOKEN_KEY, token)
+    // 写入磁盘
+    await adStore.flush()
+  }
+  async getUserToken (): Promise<string> {
+    const adStore = await this.getstore()
+    return await adStore.get(TOKEN_KEY, "") as string
   }
 }

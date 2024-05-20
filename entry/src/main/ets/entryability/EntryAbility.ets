@@ -1,7 +1,7 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import  {AdvertClass, defaultAd,UserSettingClass} from  '@xiaoshida/common'
+import  {AdvertClass, TOKEN_KEY,UserSettingClass} from  '@xiaoshida/common'
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -18,13 +18,17 @@ export default class EntryAbility extends UIAbility {
     // 这里要尝试去读一下运营的配置-我们现在还没有实现接口，直接模拟一下
     const userSetting=new UserSettingClass(this.context)
     const result=await new Promise<AdvertClass>((resolve,reject)=>{
-      setTimeout(()=>{
-        resolve({
-          showAd:true,
-          adTime:5,
-          adImg:$r('app.media.start')
-        }as AdvertClass)
-      },500)
+      try {
+        setTimeout(() => {
+          resolve({
+            showAd: true,
+            adTime: 5,
+            adImg: $r('app.media.start')
+          } as AdvertClass)
+        }, 500)
+      } catch (e) {
+        AlertDialog.show({message:JSON.stringify(reject)})
+      }
     })
     await userSetting.setUserAd(result)//写入首选项
     if (result.showAd){
@@ -32,6 +36,15 @@ export default class EntryAbility extends UIAbility {
       await win.showWindow()
       win.setUIContent("/pages/Start/Start".slice(1))
     }
+    const token = await userSetting.getUserToken()
+    if(token) {
+      AppStorage.setOrCreate(TOKEN_KEY, token)
+      windowStage.loadContent('pages/Index');
+    }else {
+      windowStage.loadContent("pages/Login/Login")
+    }
+
+
     windowStage.loadContent('/pages/Index'.slice(1), (err) => {
       if (err.code) {
         hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
