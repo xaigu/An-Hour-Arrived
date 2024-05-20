@@ -1,6 +1,7 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import  {AdvertClass, defaultAd,UserSettingClass} from  '@xiaoshida/common'
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -11,8 +12,22 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
+  async  onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
+    // 检查是否有广告
+    const setting=new UserSettingClass(this.context)//getcontext拿到的是undefined
+    //
+    const ad= await new Promise<AdvertClass>((resolve,reject)=>{
+      setTimeout(()=>{
+        resolve(defaultAd)
+      },500)
+    })
+    // 通过模拟请求拿到广告信息
+    await setting.setUserAd(ad) // 写入首选项
+    if(ad.showAd) {
+      // 展示广告的情况 展示广告页 有时限
+      // 创建一个子窗口 子窗口加载广告 广告播完 窗口销毁
+    }
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
     windowStage.loadContent('pages/Index', (err) => {

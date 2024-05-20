@@ -5,6 +5,8 @@
   "main": "",
   "author": "",
   "license": "",
-  "dependencies": {}
+  "dependencies": {
+    "@xiaoshida/common": "file:../common/basic"
+  }
 }
 
