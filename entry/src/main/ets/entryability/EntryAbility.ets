@@ -34,7 +34,7 @@ export default class EntryAbility extends UIAbility {
     if (result.showAd){
       const win =await windowStage.createSubWindow("ad_window")
       await win.showWindow()
-      win.setUIContent("/pages/Start/Start".slice(1))
+      win.setUIContent("pages/Start/Start")
     }
     const token = await userSetting.getUserToken()
     if(token) {

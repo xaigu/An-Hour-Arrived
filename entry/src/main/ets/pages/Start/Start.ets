@@ -38,6 +38,9 @@ struct Start {
         .borderRadius(15)
         .backgroundColor($r("app.color.background_page"))
         .textAlign(TextAlign.Center)
+        .onClick(() => {
+          this.closeWin()
+        })
 
     }.height('100%').width('100%')
   }
